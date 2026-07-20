@@ -13,9 +13,15 @@ const FONT = {family: "'Zen Kaku Gothic New','Hiragino Sans',sans-serif", color:
 const BASE = {paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
               font: FONT, hovermode: "x unified", dragmode: false,
               hoverlabel: {bgcolor: "#1a2230", bordercolor: "#2a3444", font: {color: INK}}};
-const CFG = {displayModeBar: false, responsive: true,
+/* 不用 responsive:true —— iOS Safari/Chrome 对容器的异步测量会把图压成细条。
+   改为渲染时显式传入像素宽高,尺寸由我们计算,Plotly 只负责画。 */
+const CFG = {displayModeBar: false,
              scrollZoom: false, doubleClick: false, showAxisDragHandles: false,
              showTips: false};
+const boxWidth = el => {
+  const w = el.clientWidth || el.parentElement.clientWidth;
+  return (w > 40 ? w : Math.min(window.innerWidth, 960) - 40) - 12; // 减内边距
+};
 /* 触摸设备:一切缩放/拖拽禁用,区间切换只走按钮;页面滚动永不被图表劫持 */
 const COARSE = matchMedia("(pointer: coarse)").matches;
 const NARROW = () => window.innerWidth < 560;
@@ -91,6 +97,7 @@ function candleChart(el, ch) {
   ], Object.assign({}, BASE, {
     title: {text: `${ch.name} <span style="font-size:12px;color:${DIM}">${ch.ticker}</span>`,
             font: {size: 15, color: INK}, x: 0.02},
+    autosize: false, width: boxWidth(el),
     height: NARROW() ? 350 : 430, margin: {l: 8, r: 46, t: 44, b: 8},
     legend: NARROW() ? {orientation: "h", y: -0.08, font: {size: 10}}
                      : {orientation: "h", y: 1.09, font: {size: 10.5}},
@@ -146,6 +153,7 @@ function scenarioChart(el, sc) {
     title: {text: `${sc.name} 未来10日情景锥 <span style="font-size:11.5px;color:${DIM}">` +
       `10日后区间 ${sc.range[0] > 0 ? "+" : ""}${sc.range[0].toFixed(1)}% ~ +${sc.range[1].toFixed(1)}%</span>`,
       font: {size: 14.5, color: INK}, x: 0.02},
+    autosize: false, width: boxWidth(el),
     height: NARROW() ? 300 : 360, margin: {l: 8, r: 46, t: 46, b: 8},
     shapes, annotations: annos,
     legend: {orientation: "h", y: -0.16, font: {size: NARROW() ? 9.5 : 10.5},
@@ -183,11 +191,13 @@ async function renderCharts() {
       if (!en.isIntersecting) continue;
       io.unobserve(en.target);
       const {kind, idx} = en.target.dataset;
-      en.target.style.minHeight = "";
+      /* 占位高度永不清除:即使渲染异常,版面也不塌 */
       (kind === "sc" ? scenarioChart : candleChart)(
         en.target, kind === "sc" ? d.scenarios[idx] : d.charts[idx]);
     }
   }, {rootMargin: "700px 0px"});
+  window.addEventListener("orientationchange",
+    () => setTimeout(() => location.reload(), 350));
   const defer = (kind, idx, h) => {
     const el = add("div", "chart-box");
     el.dataset.kind = kind; el.dataset.idx = idx;
