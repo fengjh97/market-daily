@@ -1,5 +1,7 @@
 [
- {"date": "2026-07-24", "label": "Section122关税到期"},
+ {"date": "2026-07-22", "label": "GOOGL财报(盘后)"},
+ {"date": "2026-07-23", "label": "Intel财报·Disco财报"},
+ {"date": "2026-07-24", "label": "Section122关税到期·日本CPI"},
  {"date": "2026-07-27", "label": "Kimi K3权重发布"},
- {"date": "2026-07-28", "label": "FOMC"}
+ {"date": "2026-07-30", "label": "BOJ会议(→31)"}
 ]
