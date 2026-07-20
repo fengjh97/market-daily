@@ -94,6 +94,9 @@ article hr{border:0;height:1px;background:var(--line);margin:26px 0}
   touch-action:pan-y}                       /* 图表区手指竖滑=翻页,永不劫持滚动 */
 .chart-box .js-plotly-plot,.chart-box .plot-container{touch-action:pan-y!important}
 .chart-box .rangeselector rect{rx:6}        /* 区间按钮圆角,触控目标已放大 */
+.ev-caption{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold);
+  padding:2px 12px 10px;line-height:1.7}    /* 窄屏事件说明行(替代图内旋转标注) */
+.ev-caption b{font-weight:600}
 .dash{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums;
   font-family:'IBM Plex Mono',monospace}
 .dash th,.dash td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;

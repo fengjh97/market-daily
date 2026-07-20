@@ -129,25 +129,37 @@ function scenarioChart(el, sc) {
      fillcolor: "rgba(139,124,196,.14)"},
     {x: sc.days, y: sc.p50, name: "中位路径", line: {width: 2, color: PURPLE, dash: "dash"}},
   ];
-  const shapes = [], annos = [];
+  const shapes = [], annos = [], inWindow = [];
   for (const ev of sc.events || []) {
     if (ev.date >= sc.days[0] && ev.date <= sc.days[sc.days.length - 1]) {
+      inWindow.push(ev);
       shapes.push({type: "line", x0: ev.date, x1: ev.date, y0: 0, y1: 1, yref: "paper",
                    line: {color: GOLD, width: 1, dash: "dash"}});
-      annos.push({x: ev.date, y: 1.04, yref: "paper", text: ev.label, showarrow: false,
-                  font: {size: 10, color: GOLD}, textangle: -28});
+      /* 窄屏不放旋转标注(相邻日期必然叠字),改为图下事件说明行 */
+      if (!NARROW()) {
+        annos.push({x: ev.date, y: 1.04, yref: "paper", text: ev.label, showarrow: false,
+                    font: {size: 10, color: GOLD}, textangle: -28});
+      }
     }
   }
   Plotly.newPlot(el, traces, Object.assign({}, BASE, {
     title: {text: `${sc.name} 未来10日情景锥 <span style="font-size:11.5px;color:${DIM}">` +
       `10日后区间 ${sc.range[0] > 0 ? "+" : ""}${sc.range[0].toFixed(1)}% ~ +${sc.range[1].toFixed(1)}%</span>`,
       font: {size: 14.5, color: INK}, x: 0.02},
-    height: NARROW() ? 320 : 360, margin: {l: 8, r: 46, t: 52, b: 8},
+    height: NARROW() ? 300 : 360, margin: {l: 8, r: 46, t: 46, b: 8},
     shapes, annotations: annos,
-    legend: {orientation: "h", y: -0.14, font: {size: 10.5}},
+    legend: {orientation: "h", y: -0.16, font: {size: NARROW() ? 9.5 : 10.5},
+             itemwidth: 30},
     xaxis: {gridcolor: GRID, fixedrange: true},
     yaxis: {side: "right", gridcolor: GRID, fixedrange: true},
   }), CFG);
+  if (NARROW() && inWindow.length) {          // 事件说明行(替代旋转标注)
+    const cap = document.createElement("div");
+    cap.className = "ev-caption";
+    cap.innerHTML = "┊ " + inWindow.map(e =>
+      `<b>${e.date.slice(5).replace("-", "/")}</b> ${e.label}`).join(" · ");
+    el.appendChild(cap);
+  }
 }
 
 async function renderCharts() {
@@ -164,10 +176,28 @@ async function renderCharts() {
     if (cls) e.className = cls; stage.appendChild(e); return e; };
   add("h2", "sec").textContent = "Dashboard · 仪表盘";
   add("div").innerHTML = renderDashboard(d.dashboard);
+
+  /* 懒渲染:图表进入视口前只占位,滚到附近才画——手机滑动不卡 */
+  const io = new IntersectionObserver(entries => {
+    for (const en of entries) {
+      if (!en.isIntersecting) continue;
+      io.unobserve(en.target);
+      const {kind, idx} = en.target.dataset;
+      en.target.style.minHeight = "";
+      (kind === "sc" ? scenarioChart : candleChart)(
+        en.target, kind === "sc" ? d.scenarios[idx] : d.charts[idx]);
+    }
+  }, {rootMargin: "700px 0px"});
+  const defer = (kind, idx, h) => {
+    const el = add("div", "chart-box");
+    el.dataset.kind = kind; el.dataset.idx = idx;
+    el.style.minHeight = h + "px";
+    io.observe(el);
+  };
   if (d.scenarios && d.scenarios.length) {
     add("h2", "sec").textContent = "Scenarios · 情景模拟";
-    for (const sc of d.scenarios) scenarioChart(add("div", "chart-box"), sc);
+    d.scenarios.forEach((_, i) => defer("sc", i, NARROW() ? 340 : 400));
   }
   add("h2", "sec").textContent = "Charts · K线";
-  for (const ch of d.charts) candleChart(add("div", "chart-box"), ch);
+  d.charts.forEach((_, i) => defer("ch", i, NARROW() ? 400 : 470));
 }
