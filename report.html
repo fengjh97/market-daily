@@ -50,6 +50,8 @@ const p = new URLSearchParams(location.search).get("p");   // e.g. 2026-07-21/mo
       break;
     }
   }
+  // CJK 全角标点紧贴 ** 时 CommonMark 粗体失效——先行转换
+  md = md.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
   document.getElementById("body").innerHTML = marked.parse(md);
 })();
 </script>
