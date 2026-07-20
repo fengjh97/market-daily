@@ -56,8 +56,8 @@
 </div>
 
 <script>
-const TYPE = {morning:["☀ 早晨研报","morning"], midday:["◐ 午盘汇总","midday"],
-              close:["◆ 收盘报道","close"], evening:["☾ 睡前研报","evening"]};
+const TYPE = {morning:["早晨研报","morning"], midday:["午盘汇总","midday"],
+              close:["收盘报道","close"], evening:["睡前研报","evening"]};
 const WEEK = ["日","一","二","三","四","五","六"];
 fetch("data/index.json?t=" + Date.now()).then(r => r.json()).then(idx => {
   const items = idx.items || [];
@@ -67,7 +67,7 @@ fetch("data/index.json?t=" + Date.now()).then(r => r.json()).then(idx => {
       ? `charts.html?p=${it.date}/${it.file}` : `report.html?p=${it.date}/${it.type}`;
     document.getElementById("latest").href = href;
     document.getElementById("latest-title").textContent =
-      it.kind === "charts" ? "❖ 图表端末" : label;
+      it.kind === "charts" ? "图表端末" : label;
     document.getElementById("latest-meta").textContent = `${it.date} ${it.ts} JST`;
   }
   const byDay = {};
@@ -88,7 +88,7 @@ fetch("data/index.json?t=" + Date.now()).then(r => r.json()).then(idx => {
       `<li style="animation-delay:${.2 + (i++) * .04}s">
         <a href="charts.html?p=${it.date}/${it.file}">
         <span class="t">${it.ts}</span><span class="dots"></span>
-        <span class="tag charts">❖ 图表端末 · ${it.scope}</span></a></li>`).join("");
+        <span class="tag charts">图表端末 · ${it.scope}</span></a></li>`).join("");
     return `<div class="day">${day.replaceAll("-","·")}（${w}）</div><ul class="ledger">${rows}</ul>`;
   }).join("");
 }).catch(() => document.getElementById("list").textContent = "— 暂无报告 —");
