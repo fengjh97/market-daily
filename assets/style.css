@@ -90,7 +90,10 @@ article hr{border:0;height:1px;background:var(--line);margin:26px 0}
 
 /* charts (charts.html) */
 .chart-box{background:var(--panel);border:1px solid var(--line);border-radius:12px;
-  padding:10px 6px 2px;margin:16px 0;animation:rise .6s both}
+  padding:10px 6px 2px;margin:16px 0;animation:rise .6s both;
+  touch-action:pan-y}                       /* 图表区手指竖滑=翻页,永不劫持滚动 */
+.chart-box .js-plotly-plot,.chart-box .plot-container{touch-action:pan-y!important}
+.chart-box .rangeselector rect{rx:6}        /* 区间按钮圆角,触控目标已放大 */
 .dash{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums;
   font-family:'IBM Plex Mono',monospace}
 .dash th,.dash td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;

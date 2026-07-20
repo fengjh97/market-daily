@@ -13,7 +13,12 @@ const FONT = {family: "'Zen Kaku Gothic New','Hiragino Sans',sans-serif", color:
 const BASE = {paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
               font: FONT, hovermode: "x unified", dragmode: false,
               hoverlabel: {bgcolor: "#1a2230", bordercolor: "#2a3444", font: {color: INK}}};
-const CFG = {displayModeBar: false, responsive: true};
+const CFG = {displayModeBar: false, responsive: true,
+             scrollZoom: false, doubleClick: false, showAxisDragHandles: false,
+             showTips: false};
+/* 触摸设备:一切缩放/拖拽禁用,区间切换只走按钮;页面滚动永不被图表劫持 */
+const COARSE = matchMedia("(pointer: coarse)").matches;
+const NARROW = () => window.innerWidth < 560;
 
 const sma = (a, n) => a.map((_, i) =>
   i < n - 1 ? null : a.slice(i - n + 1, i + 1).reduce((s, x) => s + x, 0) / n);
@@ -68,16 +73,21 @@ function candleChart(el, ch) {
   ], Object.assign({}, BASE, {
     title: {text: `${ch.name} <span style="font-size:12px;color:${DIM}">${ch.ticker}</span>`,
             font: {size: 15, color: INK}, x: 0.02},
-    height: 430, margin: {l: 8, r: 46, t: 44, b: 8},
-    legend: {orientation: "h", y: 1.09, font: {size: 10.5}},
+    height: NARROW() ? 350 : 430, margin: {l: 8, r: 46, t: 44, b: 8},
+    legend: NARROW() ? {orientation: "h", y: -0.08, font: {size: 10}}
+                     : {orientation: "h", y: 1.09, font: {size: 10.5}},
     xaxis: {rangeslider: {visible: false}, range: [firstView, lastM], gridcolor: GRID,
-      rangeselector: {bgcolor: "#1a2230", activecolor: "#2a3444", font: {color: INK, size: 11},
+      fixedrange: true,
+      rangeselector: {bgcolor: "#1a2230", activecolor: "#2a3444",
+        font: {color: INK, size: COARSE ? 14 : 11},
+        borderwidth: 0, x: 1, xanchor: "right", y: 1.12,
         buttons: [{count: 7, label: "1周", step: "day", stepmode: "backward"},
                   {count: 1, label: "1月", step: "month", stepmode: "backward"},
                   {count: 3, label: "3月", step: "month", stepmode: "backward"},
                   {count: 6, label: "6月", step: "month", stepmode: "backward"}]}},
-    yaxis: {domain: [0.24, 1], side: "right", gridcolor: GRID},
-    yaxis2: {domain: [0, 0.18], side: "right", gridcolor: GRID, showticklabels: false},
+    yaxis: {domain: [0.24, 1], side: "right", gridcolor: GRID, fixedrange: true},
+    yaxis2: {domain: [0, 0.18], side: "right", gridcolor: GRID, showticklabels: false,
+             fixedrange: true},
   }), CFG);
 }
 
@@ -104,9 +114,11 @@ function scenarioChart(el, sc) {
     title: {text: `${sc.name} 未来10日情景锥 <span style="font-size:11.5px;color:${DIM}">` +
       `10日后区间 ${sc.range[0] > 0 ? "+" : ""}${sc.range[0].toFixed(1)}% ~ +${sc.range[1].toFixed(1)}%</span>`,
       font: {size: 14.5, color: INK}, x: 0.02},
-    height: 360, margin: {l: 8, r: 46, t: 52, b: 8}, shapes, annotations: annos,
+    height: NARROW() ? 320 : 360, margin: {l: 8, r: 46, t: 52, b: 8},
+    shapes, annotations: annos,
     legend: {orientation: "h", y: -0.14, font: {size: 10.5}},
-    xaxis: {gridcolor: GRID}, yaxis: {side: "right", gridcolor: GRID},
+    xaxis: {gridcolor: GRID, fixedrange: true},
+    yaxis: {side: "right", gridcolor: GRID, fixedrange: true},
   }), CFG);
 }
 
