@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>図表端末 · 市場日報</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+</head>
+<body>
+<div class="wrap-wide">
+<header>
+  <h1><a href="./">市場日報</a><small id="page-title">図表端末</small></h1>
+  <div class="rule"></div>
+  <div class="meta-line" style="margin-top:14px">
+    <span class="kicker">Chart Terminal</span> ·
+    <span id="gen-ts" class="mono">loading…</span> ·
+    <span style="color:var(--up)">红=阳线</span>/<span style="color:var(--down)">青=阴线</span>
+  </div>
+</header>
+<div id="stage">加载中…</div>
+<div class="crumb"><a href="./">← 返回目录</a></div>
+<footer>automated research bulletin — not investment advice</footer>
+</div>
+<script src="assets/app.js"></script>
+<script>renderCharts();</script>
+</body>
+</html>

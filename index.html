@@ -7,101 +7,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
 <style>
-:root{
-  --bg:#0d1117; --panel:#131a24; --line:#1f2937;
-  --ink:#e6e8ec; --dim:#8b93a1; --faint:#4b5563;
-  --up:#e05252; --down:#2fb3c7; --gold:#c9a961;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{background:var(--bg)}
-body{
-  font-family:'Zen Kaku Gothic New','Hiragino Sans',sans-serif;
-  color:var(--ink); min-height:100vh; padding:0 20px 64px; overflow-x:hidden;
-  background:
-    radial-gradient(1200px 500px at 80% -10%, rgba(47,179,199,.06), transparent 60%),
-    radial-gradient(900px 400px at 10% 110%, rgba(224,82,82,.05), transparent 60%),
-    var(--bg);
-}
-body::after{ /* grain */
-  content:""; position:fixed; inset:0; pointer-events:none; opacity:.35;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .04 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-.wrap{max-width:680px;margin:0 auto}
-
-/* ── header ─────────────────────────── */
-header{padding:52px 0 24px; animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
-.candles{display:flex;gap:5px;align-items:flex-end;height:34px;margin-bottom:18px}
-.candles i{width:7px;border-radius:1.5px;position:relative}
-.candles i::before{content:"";position:absolute;left:50%;width:1.5px;transform:translateX(-50%);
-  top:-6px;bottom:-6px;background:inherit;opacity:.55}
-.c-u{background:var(--up)} .c-d{background:var(--down)}
-h1{
-  font-family:'Shippori Mincho B1',serif; font-weight:800;
-  font-size:clamp(34px,9vw,46px); letter-spacing:.06em; line-height:1.1;
-}
-h1 small{
-  display:block; font-family:'IBM Plex Mono',monospace; font-weight:400;
-  font-size:12px; letter-spacing:.32em; color:var(--dim); margin-top:10px;
-  text-transform:uppercase;
-}
-.rule{height:2px;margin:26px 0 0;background:linear-gradient(90deg,var(--up) 0 38%,var(--down) 38% 62%,transparent 62%)}
-
-/* ── latest ─────────────────────────── */
-.latest{
-  display:block; text-decoration:none; color:var(--ink);
+.latest{display:block;text-decoration:none;color:var(--ink);
   background:linear-gradient(180deg,var(--panel),#101722);
-  border:1px solid var(--line); border-radius:14px;
-  padding:24px 24px 20px; margin-top:34px; position:relative; overflow:hidden;
+  border:1px solid var(--line);border-radius:14px;
+  padding:24px 24px 20px;margin-top:30px;position:relative;overflow:hidden;
   animation:rise .7s .12s cubic-bezier(.2,.8,.2,1) both;
-  transition:border-color .25s, transform .25s;
-}
-.latest:hover{border-color:var(--gold); transform:translateY(-2px)}
+  transition:border-color .25s, transform .25s}
+.latest:hover{border-color:var(--gold);transform:translateY(-2px)}
 .latest::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;
   background:linear-gradient(var(--up),var(--down))}
-.latest .kicker{font-family:'IBM Plex Mono',monospace;font-size:11px;
-  letter-spacing:.3em;color:var(--gold);text-transform:uppercase}
 .latest .title{font-family:'Shippori Mincho B1',serif;font-weight:600;
-  font-size:24px;margin:10px 0 6px}
+  font-size:23px;margin:10px 0 6px}
 .latest .meta{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--dim)}
 .latest .go{position:absolute;right:22px;bottom:18px;font-family:'IBM Plex Mono',monospace;
   font-size:13px;color:var(--down);letter-spacing:.1em}
-
-/* ── archive ledger ─────────────────── */
-h2{
-  font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:11px;
-  letter-spacing:.34em;color:var(--faint);text-transform:uppercase;
-  margin:46px 0 8px; animation:rise .7s .2s both;
-}
-.day{
-  font-family:'Shippori Mincho B1',serif;font-weight:600;font-size:15px;
-  color:var(--dim); margin:26px 0 8px; display:flex;align-items:center;gap:12px;
-}
-.day::after{content:"";flex:1;height:1px;background:var(--line)}
-.ledger{list-style:none}
-.ledger li{animation:rise .6s both}
-.ledger a{
-  display:flex;align-items:baseline;gap:14px;text-decoration:none;
-  padding:10px 8px;border-radius:8px;color:var(--ink);
-  transition:background .2s;
-}
-.ledger a:hover{background:rgba(47,179,199,.07)}
-.ledger .t{font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--ink);font-weight:600}
-.ledger .dots{flex:1;border-bottom:1px dotted var(--faint);opacity:.5;transform:translateY(-3px)}
-.ledger .tag{font-size:12px;color:var(--dim);letter-spacing:.05em}
-.tag.us::before{content:"◆ ";color:var(--up)}
-.tag.full::before{content:"◆ ";color:var(--down)}
-
-footer{
-  margin-top:64px;font-family:'IBM Plex Mono',monospace;font-size:11px;
-  color:var(--faint);letter-spacing:.14em;line-height:2;
-}
-@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-@media (max-width:480px){
-  h1 small{letter-spacing:.15em;font-size:11px}
-  h2{letter-spacing:.22em}
-}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -117,47 +38,60 @@ footer{
   <div class="rule"></div>
 </header>
 
-<a id="latest" class="latest" href="latest.html">
+<a id="latest" class="latest" href="#">
   <span class="kicker">Latest Issue</span>
-  <div class="title" id="latest-title">最新報告</div>
+  <div class="title" id="latest-title">—</div>
   <div class="meta" id="latest-meta">loading…</div>
   <span class="go">READ →</span>
 </a>
 
-<h2>Archive · 既刊</h2>
-<div id="list" class="ledger-wrap"></div>
+<h2 class="sec">Archive · 既刊</h2>
+<div id="list"></div>
 
 <footer>
-  K線・ボリンジャー・情景錐 | <span style="color:var(--up)">红=阳线</span> /
-  <span style="color:var(--down)">青=阴线</span><br>
+  ☀ 早报 · ◐ 午盘 · ◆ 收盘 · ☾ 晚报 · ❖ 图表 |
+  <span style="color:var(--up)">红=阳线</span> / <span style="color:var(--down)">青=阴线</span><br>
   automated research bulletin — not investment advice
 </footer>
 </div>
 
 <script>
-const TYPE = {report:["全市场版","full"], us_session:["美股实时版","us"]};
+const TYPE = {morning:["☀ 早晨研报","morning"], midday:["◐ 午盘汇总","midday"],
+              close:["◆ 收盘报道","close"], evening:["☾ 睡前研报","evening"]};
 const WEEK = ["日","一","二","三","四","五","六"];
-fetch("reports/index.json?t=" + Date.now()).then(r=>r.json()).then(items=>{
-  if(items.length){
-    const it = items[0], [label] = TYPE[it.type]||[it.type];
-    document.getElementById("latest").href = "reports/"+it.file;
-    document.getElementById("latest-title").textContent = label;
-    document.getElementById("latest-meta").textContent = it.ts+" JST";
+fetch("data/index.json?t=" + Date.now()).then(r => r.json()).then(idx => {
+  const items = idx.items || [];
+  if (items.length) {
+    const it = items[0], [label] = TYPE[it.type] || [it.type];
+    const href = it.kind === "charts"
+      ? `charts.html?p=${it.date}/${it.file}` : `report.html?p=${it.date}/${it.type}`;
+    document.getElementById("latest").href = href;
+    document.getElementById("latest-title").textContent =
+      it.kind === "charts" ? "❖ 图表端末" : label;
+    document.getElementById("latest-meta").textContent = `${it.date} ${it.ts} JST`;
   }
   const byDay = {};
-  items.forEach(it => (byDay[it.ts.slice(0,10)] ||= []).push(it));
+  items.forEach(it => (byDay[it.date] ||= []).push(it));
   let i = 0;
-  document.getElementById("list").innerHTML = Object.entries(byDay).map(([day,list])=>{
+  document.getElementById("list").innerHTML = Object.entries(byDay).map(([day, list]) => {
     const w = WEEK[new Date(day).getDay()];
-    return `<div class="day">${day.replaceAll("-","·")}（${w}）</div><ul class="ledger">`+
-      list.map(it=>{
-        const [label,cls] = TYPE[it.type]||[it.type,"full"];
-        return `<li style="animation-delay:${.25+(i++)*.05}s"><a href="reports/${it.file}">
-          <span class="t">${it.ts.slice(11)}</span><span class="dots"></span>
-          <span class="tag ${cls}">${label}</span></a></li>`;
-      }).join("")+"</ul>";
+    const reports = list.filter(x => x.kind !== "charts");
+    const charts  = list.filter(x => x.kind === "charts");
+    let rows = reports.map(it => {
+      const [label, cls] = TYPE[it.type] || [it.type, "close"];
+      return `<li style="animation-delay:${.2 + (i++) * .04}s">
+        <a href="report.html?p=${it.date}/${it.type}">
+        <span class="t">${it.ts}</span><span class="dots"></span>
+        <span class="tag ${cls}">${label}</span></a></li>`;
+    }).join("");
+    rows += charts.map(it =>
+      `<li style="animation-delay:${.2 + (i++) * .04}s">
+        <a href="charts.html?p=${it.date}/${it.file}">
+        <span class="t">${it.ts}</span><span class="dots"></span>
+        <span class="tag charts">❖ 图表端末 · ${it.scope}</span></a></li>`).join("");
+    return `<div class="day">${day.replaceAll("-","·")}（${w}）</div><ul class="ledger">${rows}</ul>`;
   }).join("");
-}).catch(()=>document.getElementById("list").textContent="— 暂无报告 —");
+}).catch(() => document.getElementById("list").textContent = "— 暂无报告 —");
 </script>
 </body>
 </html>

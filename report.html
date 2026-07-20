@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>研報 · 市場日報</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1><a href="./">市場日報</a><small id="page-type">RESEARCH NOTE</small></h1>
+  <div class="rule"></div>
+  <div class="meta-line" style="margin-top:14px">
+    <span id="meta" class="mono">loading…</span>
+    <span id="charts-link"></span>
+  </div>
+</header>
+<article id="body">加载中…</article>
+<div class="crumb"><a href="./">← 返回目录</a></div>
+<footer>automated research bulletin — not investment advice</footer>
+</div>
+<script>
+const TYPE = {morning:"☀ 早晨研报 MORNING BRIEF", midday:"◐ 午盘汇总 MIDDAY",
+              close:"◆ 收盘报道 ASIA CLOSE", evening:"☾ 睡前研报 EVENING BRIEF"};
+const p = new URLSearchParams(location.search).get("p");   // e.g. 2026-07-21/morning
+(async () => {
+  if (!p) { document.getElementById("body").textContent = "缺少 ?p= 参数"; return; }
+  const [date, type] = p.split("/");
+  document.getElementById("page-type").textContent = TYPE[type] || type;
+  document.title = `${date} ${TYPE[type]||type} · 市場日報`;
+  const res = await fetch(`data/${p}.md?t=${Date.now()}`);
+  if (!res.ok) { document.getElementById("body").textContent = "报告不存在: " + p; return; }
+  let md = await res.text();
+  let ts = "";
+  const fm = md.match(/^---\n([\s\S]*?)\n---\n/);   // strip frontmatter, keep ts
+  if (fm) { const m = fm[1].match(/ts:\s*(.+)/); if (m) ts = m[1]; md = md.slice(fm[0].length); }
+  document.getElementById("meta").textContent = `${date}${ts ? " " + ts : ""} JST`;
+  // 若同日存在图表数据,给出链接
+  const scope = (type === "morning" || type === "evening") ? "full" : "asia";
+  for (const s of [scope, "full", "asia", "us"]) {
+    const head = await fetch(`data/${date}/charts_${s}.json`, {method: "HEAD"});
+    if (head.ok) {
+      document.getElementById("charts-link").innerHTML =
+        ` · <a style="color:var(--down)" href="charts.html?p=${date}/charts_${s}">❖ 打开图表端末</a>`;
+      break;
+    }
+  }
+  document.getElementById("body").innerHTML = marked.parse(md);
+})();
+</script>
+</body>
+</html>
