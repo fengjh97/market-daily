@@ -114,3 +114,17 @@ footer{margin-top:64px;font-family:'IBM Plex Mono',monospace;font-size:11px;
   h1 small{letter-spacing:.15em;font-size:11px}
   h2.sec{letter-spacing:.22em}
 }
+@media (max-width:560px){
+  header{padding:26px 0 8px}
+  h2.sec{margin:24px 0 6px}
+  .meta-line{margin-bottom:12px}
+  .dash{font-size:12px}
+  .dash th,.dash td{padding:5px 6px}
+  /* 首列吸附:横滑看指标时标的名不消失 */
+  .dash th:first-child,.dash td:first-child{
+    position:sticky;left:0;z-index:2;background:#10161f}
+  .dash .grp td{background:#1a1a10}
+  .chart-box{padding:6px 2px 0;margin:12px 0}
+  article table{display:block;overflow-x:auto;white-space:nowrap}
+  article{font-size:14.5px}
+}

@@ -58,17 +58,35 @@ function candleChart(el, ch) {
   const volColors = ch.c.map((c, i) => c >= ch.o[i] ? UP : DOWN);
   const lastM = ch.dates[ch.dates.length - 1], firstView =
     new Date(new Date(lastM).getTime() - 31 * 864e5).toISOString().slice(0, 10);
+
+  /* 核心修复:Y轴始终随可见X窗口重算(否则1月窗口套6月量程,K线被压扁) */
+  const yWindow = (a, b) => {
+    let lo = Infinity, hi = -Infinity;
+    for (let i = 0; i < ch.dates.length; i++) {
+      const d = ch.dates[i];
+      if (d < a || d > b) continue;
+      if (ch.l[i] < lo) lo = ch.l[i];
+      if (ch.h[i] > hi) hi = ch.h[i];
+      if (dnBB[i] !== null && dnBB[i] < lo) lo = dnBB[i];
+      if (upBB[i] !== null && upBB[i] > hi) hi = upBB[i];
+    }
+    if (!isFinite(lo)) return null;
+    const pad = (hi - lo) * 0.05 || hi * 0.02;
+    return [lo - pad, hi + pad];
+  };
+
   Plotly.newPlot(el, [
-    {x: ch.dates, y: upBB, name: "布林上轨", line: {width: 1, color: "rgba(139,124,196,.5)"},
-     hoverinfo: "skip"},
-    {x: ch.dates, y: dnBB, name: "布林下轨", line: {width: 1, color: "rgba(139,124,196,.5)"},
+    {x: ch.dates, y: upBB, name: "布林", showlegend: false,
+     line: {width: 1, color: "rgba(139,124,196,.5)"}, hoverinfo: "skip"},
+    {x: ch.dates, y: dnBB, name: "布林", showlegend: false,
+     line: {width: 1, color: "rgba(139,124,196,.5)"},
      fill: "tonexty", fillcolor: "rgba(139,124,196,.07)", hoverinfo: "skip"},
     {type: "candlestick", x: ch.dates, open: ch.o, high: ch.h, low: ch.l, close: ch.c,
      name: "K线", increasing: {line: {color: UP}, fillcolor: UP},
      decreasing: {line: {color: DOWN}, fillcolor: DOWN}},
     {x: ch.dates, y: sma(ch.c, 50), name: "MA50", line: {width: 2, color: GOLD}},
     {x: ch.dates, y: sma(ch.c, 200), name: "MA200", line: {width: 2, color: PURPLE}},
-    {type: "bar", x: ch.dates, y: ch.v, name: "成交量", yaxis: "y2",
+    {type: "bar", x: ch.dates, y: ch.v, name: "成交量", yaxis: "y2", showlegend: false,
      marker: {color: volColors}, opacity: .45, hoverinfo: "skip"},
   ], Object.assign({}, BASE, {
     title: {text: `${ch.name} <span style="font-size:12px;color:${DIM}">${ch.ticker}</span>`,
@@ -88,7 +106,17 @@ function candleChart(el, ch) {
     yaxis: {domain: [0.24, 1], side: "right", gridcolor: GRID, fixedrange: true},
     yaxis2: {domain: [0, 0.18], side: "right", gridcolor: GRID, showticklabels: false,
              fixedrange: true},
-  }), CFG);
+  }), CFG).then(() => {
+    const yr = yWindow(firstView, lastM);
+    if (yr) Plotly.relayout(el, {"yaxis.range": yr});
+    el.on("plotly_relayout", ev => {           // 区间按钮切换后重算Y量程
+      const a = ev["xaxis.range[0]"] || (ev["xaxis.range"] && ev["xaxis.range"][0]);
+      const b = ev["xaxis.range[1]"] || (ev["xaxis.range"] && ev["xaxis.range"][1]);
+      if (!a) return;                           // 我们自己的yaxis relayout不会带xaxis键,无循环
+      const yr2 = yWindow(String(a).slice(0, 10), String(b).slice(0, 10));
+      if (yr2) Plotly.relayout(el, {"yaxis.range": yr2});
+    });
+  });
 }
 
 function scenarioChart(el, sc) {
