@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>每日市场报告</title>
+<style>
+ :root{--ink:#1f2430;--muted:#6b7280;--accent:#6B5CA5;--up:#C0392B;--down:#0891B2}
+ body{font-family:'Hiragino Sans','Noto Sans CJK SC',sans-serif;background:#fcfcfb;
+      color:var(--ink);max-width:720px;margin:0 auto;padding:24px 16px}
+ h1{font-size:22px} h2{font-size:15px;color:var(--muted);margin:22px 0 8px}
+ .latest{display:block;background:var(--accent);color:#fff;text-decoration:none;
+      padding:14px 18px;border-radius:10px;font-size:16px;font-weight:600;margin:14px 0}
+ .latest small{display:block;font-weight:400;opacity:.85;margin-top:3px;font-size:12px}
+ ul{list-style:none;padding:0} li{margin:4px 0}
+ a.rep{color:var(--ink);text-decoration:none;display:flex;justify-content:space-between;
+      padding:9px 12px;border:1px solid rgba(0,0,0,.08);border-radius:8px}
+ a.rep:hover{background:rgba(107,92,165,.06)}
+ .tag{font-size:12px;color:var(--muted)}
+ .day{font-weight:700;margin-top:16px;font-size:14px}
+ footer{color:var(--muted);font-size:12px;margin-top:28px}
+</style>
+</head>
+<body>
+<h1>📊 每日市场报告</h1>
+<p style="color:var(--muted);font-size:13px">日股 · 韩股 · 美股 · 宏观 | K线布林带 · 情景模拟 ·
+ <span style="color:var(--up)">红涨</span>/<span style="color:var(--down)">青跌</span></p>
+<a id="latest" class="latest" href="latest.html">▶ 打开最新报告<small id="latest-ts"></small></a>
+<h2>历史存档</h2>
+<div id="list">加载中…</div>
+<footer>自动生成 · 仅供研究,不构成投资建议</footer>
+<script>
+const TYPE = {report:"全市场", us_session:"美股实时"};
+fetch("reports/index.json?t=" + Date.now()).then(r => r.json()).then(items => {
+  if (items.length) {
+    document.getElementById("latest").href = "reports/" + items[0].file;
+    document.getElementById("latest-ts").textContent = items[0].ts + " · " + (TYPE[items[0].type] || items[0].type);
+  }
+  const byDay = {};
+  items.forEach(it => { (byDay[it.ts.slice(0,10)] ||= []).push(it); });
+  document.getElementById("list").innerHTML = Object.entries(byDay).map(([day, list]) =>
+    `<div class="day">${day}</div><ul>` + list.map(it =>
+      `<li><a class="rep" href="reports/${it.file}">
+         <span>${it.ts.slice(11)} 版</span><span class="tag">${TYPE[it.type] || it.type}</span></a></li>`
+    ).join("") + "</ul>"
+  ).join("");
+}).catch(() => document.getElementById("list").textContent = "暂无报告");
+</script>
+</body>
+</html>
