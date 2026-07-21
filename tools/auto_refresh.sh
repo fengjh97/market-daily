@@ -44,3 +44,6 @@ if [ "$CHANGED" = 1 ]; then
     echo "$(date '+%F %T') pushed ($SCOPES)"
   }
 fi
+
+# 点位监视(与行情刷新同频,盘中才会执行到这里)
+"$PY" "$SITE/tools/level_watch.py" 2>/dev/null || true
