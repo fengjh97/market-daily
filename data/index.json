@@ -1,6 +1,19 @@
 {
- "updated": "2026-07-21 07:49",
+ "updated": "2026-07-21 12:07",
  "items": [
+  {
+   "kind": "report",
+   "date": "2026-07-21",
+   "type": "midday",
+   "ts": "12:07"
+  },
+  {
+   "kind": "charts",
+   "date": "2026-07-21",
+   "file": "charts_asia",
+   "scope": "asia",
+   "ts": "12:07"
+  },
   {
    "kind": "report",
    "date": "2026-07-21",
