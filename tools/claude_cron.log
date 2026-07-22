@@ -12,3 +12,10 @@
 
 数据备注:Brent当日OHLC数据源异常(高<开),报告中已标注并用WTI交叉验证。已发mac通知。
 2026-07-22 23:12:37 done usclose (exit 0)
+2026-07-23 00:00:00 missing prompt morning 7 13
+2026-07-23 00:00:00 missing prompt usclose 6 7
+2026-07-23 00:00:00 missing prompt close 15 37
+2026-07-23 00:00:00 missing prompt usopen 22 36
+2026-07-23 00:00:00 missing prompt midday 11 37
+2026-07-23 00:00:00 missing prompt open 9 6
+2026-07-23 00:00:00 missing prompt evening 21 33
