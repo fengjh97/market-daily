@@ -57,7 +57,7 @@
 
 <script>
 const TYPE = {morning:["早晨研报","morning"], midday:["午盘汇总","midday"],
-              close:["收盘报道","close"], evening:["睡前研报","evening"]};
+              close:["收盘报道","close"], evening:["睡前研报","evening"], special:["研究特辑","morning"]};
 const WEEK = ["日","一","二","三","四","五","六"];
 fetch("data/index.json?t=" + Date.now()).then(r => r.json()).then(idx => {
   const items = idx.items || [];

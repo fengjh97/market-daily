@@ -18,7 +18,7 @@ import subprocess
 from datetime import datetime
 
 SITE = os.path.expanduser("~/finance/site")
-TYPES = ["morning", "midday", "close", "evening"]
+TYPES = ["morning", "midday", "close", "evening", "special"]
 
 
 def rebuild_index() -> int:
