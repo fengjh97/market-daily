@@ -1,18 +1,52 @@
 {
- "updated": "2026-07-21 21:57",
+ "updated": "2026-07-22 12:01",
  "items": [
   {
    "kind": "report",
+   "date": "2026-07-22",
+   "type": "morning",
+   "ts": "12:05"
+  },
+  {
+   "kind": "charts",
+   "date": "2026-07-22",
+   "file": "charts_asia",
+   "scope": "asia",
+   "ts": "12:00"
+  },
+  {
+   "kind": "charts",
+   "date": "2026-07-22",
+   "file": "charts_full",
+   "scope": "full",
+   "ts": "12:00"
+  },
+  {
+   "kind": "charts",
+   "date": "2026-07-22",
+   "file": "charts_us",
+   "scope": "us",
+   "ts": "05:06"
+  },
+  {
+   "kind": "charts",
    "date": "2026-07-21",
-   "type": "evening",
-   "ts": "21:57"
+   "file": "charts_us",
+   "scope": "us",
+   "ts": "23:57"
   },
   {
    "kind": "charts",
    "date": "2026-07-21",
    "file": "charts_full",
    "scope": "full",
-   "ts": "21:54"
+   "ts": "23:57"
+  },
+  {
+   "kind": "report",
+   "date": "2026-07-21",
+   "type": "evening",
+   "ts": "21:57"
   },
   {
    "kind": "report",
