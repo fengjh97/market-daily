@@ -25,8 +25,8 @@
 <footer>automated research bulletin — not investment advice</footer>
 </div>
 <script>
-const TYPE = {morning:"☀ 早晨研报 MORNING BRIEF", midday:"◐ 午盘汇总 MIDDAY",
-              close:"◆ 收盘报道 ASIA CLOSE", evening:"☾ 睡前研报 EVENING BRIEF", special:"★ 研究特辑 SPECIAL REPORT"};
+const TYPE = {usclose:"🌃 美股收盘 US CLOSE", morning:"☀ 早晨研报 MORNING BRIEF", open:"🔔 日韩开盘 ASIA OPEN", midday:"◐ 午盘汇总 MIDDAY",
+              close:"◆ 收盘报道 ASIA CLOSE", evening:"☾ 睡前研报 EVENING BRIEF", usopen:"⚡ 美股开盘 US OPEN", special:"★ 研究特辑 SPECIAL REPORT"};
 const p = new URLSearchParams(location.search).get("p");   // e.g. 2026-07-21/morning
 (async () => {
   if (!p) { document.getElementById("body").textContent = "缺少 ?p= 参数"; return; }
