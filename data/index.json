@@ -1,25 +1,31 @@
 {
- "updated": "2026-07-23 09:09",
+ "updated": "2026-07-23 11:39",
  "items": [
   {
    "kind": "report",
    "date": "2026-07-23",
-   "type": "open",
-   "ts": "09:09"
+   "type": "midday",
+   "ts": "11:39"
   },
   {
    "kind": "charts",
    "date": "2026-07-23",
    "file": "charts_asia",
    "scope": "asia",
-   "ts": "09:07"
+   "ts": "11:37"
   },
   {
    "kind": "charts",
    "date": "2026-07-23",
    "file": "charts_full",
    "scope": "full",
-   "ts": "09:07"
+   "ts": "11:35"
+  },
+  {
+   "kind": "report",
+   "date": "2026-07-23",
+   "type": "open",
+   "ts": "09:09"
   },
   {
    "kind": "report",
