@@ -1,19 +1,19 @@
 {
- "updated": "2026-07-23 12:28",
+ "updated": "2026-07-23 13:01",
  "items": [
-  {
-   "kind": "charts",
-   "date": "2026-07-23",
-   "file": "charts_asia",
-   "scope": "asia",
-   "ts": "12:27"
-  },
   {
    "kind": "charts",
    "date": "2026-07-23",
    "file": "charts_full",
    "scope": "full",
-   "ts": "12:27"
+   "ts": "13:01"
+  },
+  {
+   "kind": "charts",
+   "date": "2026-07-23",
+   "file": "charts_asia",
+   "scope": "asia",
+   "ts": "12:59"
   },
   {
    "kind": "report",

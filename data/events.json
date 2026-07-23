@@ -1,7 +1,8 @@
 [
- {"date": "2026-07-22", "label": "GOOGL财报(盘后)"},
- {"date": "2026-07-23", "label": "Intel财报·Disco财报"},
- {"date": "2026-07-24", "label": "Section122关税到期·日本CPI"},
- {"date": "2026-07-27", "label": "Kimi K3权重发布"},
- {"date": "2026-07-30", "label": "BOJ会议(→31)"}
+ {"date": "2026-07-24", "label": "Section122失效·日本CPI"},
+ {"date": "2026-07-27", "label": "Kimi K3权重(预期)"},
+ {"date": "2026-07-29", "label": "FOMC决议·MSFT+META财报"},
+ {"date": "2026-07-30", "label": "美GDP+PCE·AAPL+AMZN·三星财报·BOJ开始"},
+ {"date": "2026-07-31", "label": "BOJ决议·东京CPI·铠侠财报"},
+ {"date": "2026-08-02", "label": "OPEC+会议"}
 ]
