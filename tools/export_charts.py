@@ -23,20 +23,43 @@ warnings.filterwarnings("ignore")
 
 SITE = os.path.expanduser("~/finance/site")
 
-ASIA = [("日本", "^N225", "日经225"), ("日本", "1306.T", "TOPIX ETF"),
-        ("日本", "7203.T", "丰田"), ("日本", "285A.T", "铠侠"),
-        ("日本", "9984.T", "软银G"), ("日本", "8035.T", "东京电子"),
-        ("日本", "6857.T", "Advantest"),
-        ("韩国", "^KS11", "KOSPI"), ("韩国", "000660.KS", "SK海力士")]
-US = [("美国", "SPY", "标普500 ETF"), ("美国", "QQQ", "纳指100 ETF"),
-      ("美国", "SMH", "费半 ETF"), ("美国", "NVDA", "英伟达"),
-      ("美国", "MU", "美光"), ("美国", "TSM", "台积电")]
-MACRO = [("宏观", "JPY=X", "USDJPY"), ("宏观", "GC=F", "黄金"), ("宏观", "BZ=F", "Brent原油")]
+ASIA = [
+    ("日本", "^N225", "日经225", "点"),
+    ("日本", "1306.T", "TOPIX ETF", "日元"),
+    ("日本", "7203.T", "丰田", "日元"),
+    ("日本", "285A.T", "铠侠", "日元"),
+    ("日本", "9984.T", "软银集团", "日元"),
+    ("日本", "8035.T", "东京电子", "日元"),
+    ("日本", "6857.T", "Advantest", "日元"),
+    ("韩国", "^KS11", "KOSPI", "点"),
+    ("韩国", "000660.KS", "SK海力士", "韩元"),
+]
+US = [
+    ("美国", "SPY", "标普500 ETF", "美元"),
+    ("美国", "QQQ", "纳指100 ETF", "美元"),
+    ("美国", "SMH", "半导体 ETF", "美元"),
+    ("美国", "NVDA", "英伟达", "美元"),
+    ("美国", "MU", "美光", "美元"),
+    ("美国", "TSM", "台积电ADR", "美元"),
+]
+MACRO = [
+    ("宏观", "JPY=X", "USDJPY", "日元/美元"),
+    ("宏观", "^VIX", "VIX恐慌指数", "点"),
+    ("宏观", "^TNX", "美国10年期国债收益率", "%"),
+    ("宏观", "DX-Y.NYB", "美元指数DXY", "点"),
+    ("期货", "ES=F", "标普500期货", "点"),
+    ("期货", "NQ=F", "纳斯达克100期货", "点"),
+    ("期货", "NKD=F", "日经225美元期货", "点"),
+    ("宏观", "GC=F", "黄金", "美元/盎司"),
+    ("宏观", "BZ=F", "Brent原油", "美元/桶"),
+]
+ASIA_MACRO_TICKERS = {"JPY=X", "^VIX", "NKD=F", "GC=F", "BZ=F"}
+ASIA_MACRO = [row for row in MACRO if row[1] in ASIA_MACRO_TICKERS]
 
 SCOPES = {
     "full": {"title": "全市场 · 日韩美+宏观", "rows": ASIA + US + MACRO,
              "scenarios": ["^N225", "SMH", "JPY=X", "GC=F"]},
-    "asia": {"title": "亚洲 · 日韩", "rows": ASIA + MACRO[:1],
+    "asia": {"title": "亚洲 · 日韩", "rows": ASIA + ASIA_MACRO,
              "scenarios": ["^N225", "285A.T"]},
     "us":   {"title": "美股", "rows": US + MACRO,
              "scenarios": ["SMH", "QQQ"]},
@@ -76,26 +99,36 @@ def main() -> None:
         events = json.load(open(ev_path))
 
     dashboard, charts, scenarios = [], [], []
-    for group, ticker, name in cfg["rows"]:
-        h = yf.Ticker(ticker).history(period="6mo", interval="1d")
-        if h.empty:
+    for group, ticker, name, unit in cfg["rows"]:
+        h_all = yf.Ticker(ticker).history(period="1y", interval="1d")
+        if h_all.empty:
             continue
-        h = h.dropna(subset=["Close"])
-        c = h["Close"].values
+        h_all = h_all.dropna(subset=["Close"])
+        h = h_all.tail(126)
+        c = h_all["Close"].values
+        c6 = h["Close"].values
         last = c[-1]
         ma50 = c[-50:].mean() if len(c) >= 50 else None
-        ma200 = c[-200:].mean() if len(c) >= 120 else None
+        ma200 = c[-200:].mean() if len(c) >= 200 else None
         bb_m, bb_s = c[-20:].mean(), c[-20:].std()
+        bb_upper = bb_m + 2 * bb_s
+        bb_lower = bb_m - 2 * bb_s
         dashboard.append({
-            "group": group, "name": name, "ticker": ticker, "last": r(last, 2),
+            "group": group, "name": name, "ticker": ticker, "unit": unit,
+            "source": "Yahoo Finance via yfinance",
+            "price_date": h_all.index[-1].strftime("%Y-%m-%d"),
+            "last": r(last, 3), "change1_abs": r(last - c[-2], 3) if len(c) > 1 else None,
             "d1": r((last / c[-2] - 1) * 100, 2) if len(c) > 1 else None,
             "w1": r((last / c[-6] - 1) * 100, 2) if len(c) > 6 else None,
             "m1": r((last / c[-22] - 1) * 100, 2) if len(c) > 22 else None,
             "rsi": r(rsi14(c), 1),
+            "ma50": r(ma50, 3), "ma200": r(ma200, 3),
             "vs50": r((last / ma50 - 1) * 100, 2) if ma50 else None,
             "vs200": r((last / ma200 - 1) * 100, 2) if ma200 else None,
+            "bb_upper": r(bb_upper, 3), "bb_lower": r(bb_lower, 3),
             "bbz": r((last - bb_m) / bb_s, 2) if bb_s else None,
-            "dd": r((last / c.max() - 1) * 100, 2),
+            "high_6m": r(c6.max(), 3), "low_6m": r(c6.min(), 3),
+            "dd": r((last / c6.max() - 1) * 100, 2),
         })
         charts.append({
             "name": name, "ticker": ticker,
@@ -124,6 +157,7 @@ def main() -> None:
             })
 
     out = {"generated": datetime.now().strftime("%Y-%m-%d %H:%M"),
+           "data_source": "Yahoo Finance via yfinance; daily OHLCV, latest bar may be intraday",
            "scope": args.scope, "title": cfg["title"],
            "dashboard": dashboard, "charts": charts, "scenarios": scenarios}
     path = f"{outdir}/charts_{args.scope}.json"
