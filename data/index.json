@@ -1,6 +1,19 @@
 {
- "updated": "2026-08-04 05:13",
+ "updated": "2026-08-04 07:20",
  "items": [
+  {
+   "kind": "report",
+   "date": "2026-08-04",
+   "type": "morning",
+   "ts": "07:20"
+  },
+  {
+   "kind": "charts",
+   "date": "2026-08-04",
+   "file": "charts_full",
+   "scope": "full",
+   "ts": "07:15"
+  },
   {
    "kind": "report",
    "date": "2026-08-04",
@@ -12,13 +25,6 @@
    "date": "2026-08-04",
    "file": "charts_us",
    "scope": "us",
-   "ts": "05:09"
-  },
-  {
-   "kind": "charts",
-   "date": "2026-08-04",
-   "file": "charts_full",
-   "scope": "full",
    "ts": "05:09"
   },
   {
