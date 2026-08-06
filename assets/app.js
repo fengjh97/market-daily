@@ -25,6 +25,21 @@ const boxWidth = el => {
 /* 触摸设备:一切缩放/拖拽禁用,区间切换只走按钮;页面滚动永不被图表劫持 */
 const COARSE = matchMedia("(pointer: coarse)").matches;
 const NARROW = () => window.innerWidth < 560;
+const RAW_DATA_ROOT =
+  "https://raw.githubusercontent.com/fengjh97/market-daily/main/data";
+
+/* 五分钟行情提交不再触发整站部署。图表优先读取 main 上的最新 JSON；
+   若 raw.githubusercontent.com 暂时不可用，再退回 Pages 随报告部署的快照。 */
+async function fetchChartPayload(p) {
+  const suffix = `${p}.json?t=${Date.now()}`;
+  try {
+    const live = await fetch(`${RAW_DATA_ROOT}/${suffix}`, {cache: "no-store"});
+    if (live.ok) return live;
+  } catch (_) {
+    // Network/CORS errors use the deployed snapshot below.
+  }
+  return fetch(`data/${suffix}`, {cache: "no-store"});
+}
 
 const sma = (a, n) => a.map((_, i) =>
   i < n - 1 ? null : a.slice(i - n + 1, i + 1).reduce((s, x) => s + x, 0) / n);
@@ -173,7 +188,7 @@ function scenarioChart(el, sc) {
 async function renderCharts() {
   const p = new URLSearchParams(location.search).get("p");
   if (!p) { document.getElementById("stage").textContent = "缺少 ?p= 参数"; return; }
-  const res = await fetch(`data/${p}.json?t=${Date.now()}`);
+  const res = await fetchChartPayload(p);
   if (!res.ok) { document.getElementById("stage").textContent = "数据不存在: " + p; return; }
   const d = await res.json();
   document.getElementById("page-title").textContent = d.title || "图表终端";

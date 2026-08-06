@@ -17,7 +17,7 @@ elif in_us; then SCOPES="us full"
 else exit 0; fi
 
 DATE=$(date +%Y-%m-%d)
-CHANGED=0
+CHANGED_FILES=()
 for s in $SCOPES; do
   F="$SITE/data/$DATE/charts_$s.json"
   [ -f "$F" ] && cp "$F" "/tmp/prev_$s.json"
@@ -31,15 +31,16 @@ a.pop("generated", None); b.pop("generated", None)
 sys.exit(0 if a == b else 1)   # 相同→exit0→还原文件
 EOF
     then git -C "$SITE" checkout -q -- "data/$DATE/charts_$s.json" 2>/dev/null || true
-    else CHANGED=1; fi
-  else CHANGED=1; fi
+    else CHANGED_FILES+=("data/$DATE/charts_$s.json"); fi
+  else CHANGED_FILES+=("data/$DATE/charts_$s.json"); fi
 done
 
-if [ "$CHANGED" = 1 ]; then
+if [ "${#CHANGED_FILES[@]}" -gt 0 ]; then
   cd "$SITE"
-  git add -A
-  git diff --cached --quiet || {
-    git commit -q -m "auto: quotes $(date '+%m-%d %H:%M')"
+  # 保证自动提交只包含行情 JSON，让 Pages 的 paths-ignore 稳定生效。
+  git add -- "${CHANGED_FILES[@]}"
+  git diff --cached --quiet -- "${CHANGED_FILES[@]}" || {
+    git commit -q -m "auto: quotes $(date '+%m-%d %H:%M')" -- "${CHANGED_FILES[@]}"
     git push -q
     echo "$(date '+%F %T') pushed ($SCOPES)"
   }
