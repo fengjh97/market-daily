@@ -1,6 +1,19 @@
 {
- "updated": "2026-08-11 15:44",
+ "updated": "2026-08-11 21:44",
  "items": [
+  {
+   "kind": "report",
+   "date": "2026-08-11",
+   "type": "evening",
+   "ts": "21:44"
+  },
+  {
+   "kind": "charts",
+   "date": "2026-08-11",
+   "file": "charts_full",
+   "scope": "full",
+   "ts": "21:34"
+  },
   {
    "kind": "report",
    "date": "2026-08-11",
@@ -13,13 +26,6 @@
    "file": "charts_asia",
    "scope": "asia",
    "ts": "15:38"
-  },
-  {
-   "kind": "charts",
-   "date": "2026-08-11",
-   "file": "charts_full",
-   "scope": "full",
-   "ts": "15:35"
   },
   {
    "kind": "report",
