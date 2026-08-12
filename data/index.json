@@ -1,25 +1,45 @@
 {
- "updated": "2026-08-12 22:39",
+ "updated": "2026-08-13 05:11",
  "items": [
   {
    "kind": "report",
-   "date": "2026-08-12",
-   "type": "usopen",
-   "ts": "22:39"
+   "date": "2026-08-13",
+   "type": "usclose",
+   "ts": "05:11"
+  },
+  {
+   "kind": "charts",
+   "date": "2026-08-13",
+   "file": "charts_us",
+   "scope": "us",
+   "ts": "05:08"
+  },
+  {
+   "kind": "charts",
+   "date": "2026-08-13",
+   "file": "charts_full",
+   "scope": "full",
+   "ts": "05:08"
   },
   {
    "kind": "charts",
    "date": "2026-08-12",
    "file": "charts_us",
    "scope": "us",
-   "ts": "22:38"
+   "ts": "23:58"
   },
   {
    "kind": "charts",
    "date": "2026-08-12",
    "file": "charts_full",
    "scope": "full",
-   "ts": "22:37"
+   "ts": "23:58"
+  },
+  {
+   "kind": "report",
+   "date": "2026-08-12",
+   "type": "usopen",
+   "ts": "22:39"
   },
   {
    "kind": "report",
