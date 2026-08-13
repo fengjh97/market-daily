@@ -13,10 +13,14 @@ Usage:
 import argparse
 import json
 import os
+import re
 import warnings
 from datetime import datetime
+from urllib.request import Request, urlopen
+from zoneinfo import ZoneInfo
 
 import numpy as np
+import pandas as pd
 import yfinance as yf
 
 warnings.filterwarnings("ignore")
@@ -66,6 +70,112 @@ SCOPES = {
 }
 
 
+YAHOO_JP_LIVE = {"^N225": "998407.O", "1306.T": "1306.T", "7203.T": "7203.T",
+                 "285A.T": "285A.T", "9984.T": "9984.T", "8035.T": "8035.T",
+                 "6857.T": "6857.T"}
+NAVER_LIVE = {
+    "^KS11": "https://polling.finance.naver.com/api/realtime/domestic/index/KOSPI",
+    "000660.KS": "https://polling.finance.naver.com/api/realtime/domestic/stock/000660",
+}
+
+
+def _number(value):
+    if value is None:
+        return None
+    value = str(value).replace(",", "").replace(" ", "")
+    if value in {"", "---", "--:--"}:
+        return None
+    return float(value)
+
+
+def parse_yahoo_jp_live(html: str):
+    """Parse the server-rendered Yahoo Japan quote summary without JavaScript."""
+    text = re.sub(r"<[^>]+>", " ", html)
+    text = re.sub(r"\s+", " ", text)
+    quote = re.search(
+        r"(?:ポートフォリオに追加|日経平均株価)\s+([\d,.]+)\s+前日比\s+"
+        r"([+\-]?\s?[\d,.]+)\s+\(\s*([+\-]?\s?[\d,.]+)\s*%\s*\).*?"
+        r"(\d{1,2}:\d{2})", text)
+    if not quote:
+        return None
+    fields = {}
+    for key in ("前日終値", "始値", "高値", "安値", "出来高"):
+        match = re.search(key + r"\s+用語\s+([\d,.-]+)\s+\(\s*([^)]*)\)", text)
+        fields[key] = _number(match.group(1)) if match else None
+    return {
+        "close": _number(quote.group(1)), "change": _number(quote.group(2)),
+        "change_pct": _number(quote.group(3)), "time": quote.group(4),
+        "previous_close": fields["前日終値"], "open": fields["始値"],
+        "high": fields["高値"], "low": fields["安値"],
+        "volume": int(fields["出来高"] or 0),
+    }
+
+
+def parse_naver_live(payload: dict):
+    rows = payload.get("datas") or []
+    if not rows or rows[0].get("marketStatus") not in {"OPEN", "CLOSE"}:
+        return None
+    row = rows[0]
+    stamp = row.get("localTradedAt") or payload.get("time", "")
+    close = _number(row.get("closePriceRaw") or row.get("closePrice"))
+    change = _number(row.get("compareToPreviousClosePriceRaw") or row.get("compareToPreviousClosePrice"))
+    return {
+        "close": close, "change": change,
+        "change_pct": _number(row.get("fluctuationsRatioRaw") or row.get("fluctuationsRatio")),
+        "previous_close": close - change if close is not None and change is not None else None,
+        "time": stamp[11:16] if "T" in stamp else stamp[8:12],
+        "open": _number(row.get("openPriceRaw") or row.get("openPrice")),
+        "high": _number(row.get("highPriceRaw") or row.get("highPrice")),
+        "low": _number(row.get("lowPriceRaw") or row.get("lowPrice")),
+        "volume": int(_number(row.get("accumulatedTradingVolumeRaw") or row.get("accumulatedTradingVolume")) or 0),
+    }
+
+
+def fetch_asia_live(ticker: str):
+    """Return a current Tokyo/Seoul bar when Yahoo's daily feed lags the open."""
+    now = datetime.now(ZoneInfo("Asia/Tokyo"))
+    if now.weekday() >= 5 or not (9 <= now.hour < 17):
+        return None
+    try:
+        headers = {"User-Agent": "Mozilla/5.0", "Accept-Encoding": "identity"}
+        if ticker in YAHOO_JP_LIVE:
+            url = f"https://finance.yahoo.co.jp/quote/{YAHOO_JP_LIVE[ticker]}"
+            html = urlopen(Request(url, headers=headers), timeout=8).read().decode("utf-8", "ignore")
+            live = parse_yahoo_jp_live(html)
+            source = "Yahoo! Finance Japan realtime"
+        elif ticker in NAVER_LIVE:
+            url = NAVER_LIVE[ticker]
+            payload = json.loads(urlopen(Request(url, headers=headers), timeout=8).read())
+            live = parse_naver_live(payload)
+            source = "Naver Finance realtime"
+        else:
+            return None
+        if not live or live.get("close") is None:
+            return None
+        live.update({"date": datetime.now().strftime("%Y-%m-%d"), "source": source})
+        return live
+    except Exception as exc:
+        print(f"live fallback unavailable for {ticker}: {exc}")
+        return None
+
+
+def merge_live_bar(history: pd.DataFrame, live: dict):
+    index = pd.Timestamp(live["date"])
+    if history.index.tz is not None:
+        index = index.tz_localize(history.index.tz)
+    if history.index[-1].date() > index.date():
+        return history
+    if history.index[-1].date() == index.date():
+        history = history.iloc[:-1]
+    close = live["close"]
+    row = pd.DataFrame({
+        "Open": [live.get("open") or close], "High": [live.get("high") or close],
+        "Low": [live.get("low") or close], "Close": [close],
+        "Volume": [live.get("volume") or 0],
+    }, index=[index])
+    return pd.concat([history, row])
+
+
 def rsi14(c: np.ndarray):
     if len(c) < 20:
         return None
@@ -104,6 +214,9 @@ def main() -> None:
         if h_all.empty:
             continue
         h_all = h_all.dropna(subset=["Close"])
+        live = fetch_asia_live(ticker) if args.scope in {"asia", "full"} else None
+        if live and live["date"] >= h_all.index[-1].strftime("%Y-%m-%d"):
+            h_all = merge_live_bar(h_all, live)
         h = h_all.tail(126)
         c = h_all["Close"].values
         c6 = h["Close"].values
@@ -115,10 +228,11 @@ def main() -> None:
         bb_lower = bb_m - 2 * bb_s
         dashboard.append({
             "group": group, "name": name, "ticker": ticker, "unit": unit,
-            "source": "Yahoo Finance via yfinance",
+            "source": live["source"] if live else "Yahoo Finance via yfinance",
             "price_date": h_all.index[-1].strftime("%Y-%m-%d"),
-            "last": r(last, 3), "change1_abs": r(last - c[-2], 3) if len(c) > 1 else None,
-            "d1": r((last / c[-2] - 1) * 100, 2) if len(c) > 1 else None,
+            "last": r(last, 3),
+            "change1_abs": r(live["change"], 3) if live and live.get("change") is not None else (r(last - c[-2], 3) if len(c) > 1 else None),
+            "d1": r(live["change_pct"], 2) if live and live.get("change_pct") is not None else (r((last / c[-2] - 1) * 100, 2) if len(c) > 1 else None),
             "w1": r((last / c[-6] - 1) * 100, 2) if len(c) > 6 else None,
             "m1": r((last / c[-22] - 1) * 100, 2) if len(c) > 22 else None,
             "rsi": r(rsi14(c), 1),
@@ -157,7 +271,7 @@ def main() -> None:
             })
 
     out = {"generated": datetime.now().strftime("%Y-%m-%d %H:%M"),
-           "data_source": "Yahoo Finance via yfinance; daily OHLCV, latest bar may be intraday",
+           "data_source": "Yahoo Finance via yfinance; Tokyo/Seoul realtime fallback when daily bars lag",
            "scope": args.scope, "title": cfg["title"],
            "dashboard": dashboard, "charts": charts, "scenarios": scenarios}
     path = f"{outdir}/charts_{args.scope}.json"
