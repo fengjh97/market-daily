@@ -1,6 +1,19 @@
 {
- "updated": "2026-08-15 05:13",
+ "updated": "2026-08-17 07:20",
  "items": [
+  {
+   "kind": "report",
+   "date": "2026-08-17",
+   "type": "morning",
+   "ts": "07:20"
+  },
+  {
+   "kind": "charts",
+   "date": "2026-08-17",
+   "file": "charts_full",
+   "scope": "full",
+   "ts": "07:14"
+  },
   {
    "kind": "report",
    "date": "2026-08-15",
