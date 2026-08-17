@@ -123,6 +123,7 @@ def parse_naver_live(payload: dict):
         "close": close, "change": change,
         "change_pct": _number(row.get("fluctuationsRatioRaw") or row.get("fluctuationsRatio")),
         "previous_close": close - change if close is not None and change is not None else None,
+        "date": stamp[:10] if "T" in stamp else None,
         "time": stamp[11:16] if "T" in stamp else stamp[8:12],
         "open": _number(row.get("openPriceRaw") or row.get("openPrice")),
         "high": _number(row.get("highPriceRaw") or row.get("highPrice")),
@@ -152,7 +153,8 @@ def fetch_asia_live(ticker: str):
             return None
         if not live or live.get("close") is None:
             return None
-        live.update({"date": datetime.now().strftime("%Y-%m-%d"), "source": source})
+        live.update({"date": live.get("date") or datetime.now().strftime("%Y-%m-%d"),
+                     "source": source})
         return live
     except Exception as exc:
         print(f"live fallback unavailable for {ticker}: {exc}")

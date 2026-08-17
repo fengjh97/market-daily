@@ -30,8 +30,18 @@ class LiveFallbackParsingTest(unittest.TestCase):
         quote = MODULE.parse_naver_live(payload)
         self.assertEqual(quote["close"], 6878.70)
         self.assertEqual(quote["previous_close"], 6579.04)
+        self.assertEqual(quote["date"], "2026-08-13")
         self.assertEqual(quote["time"], "09:11")
         self.assertEqual(quote["volume"], 53344000)
+
+    def test_naver_closed_quote_keeps_last_trading_date(self):
+        payload = {"datas": [{"marketStatus": "CLOSE", "closePriceRaw": "6977.94",
+            "compareToPreviousClosePriceRaw": "164.60", "fluctuationsRatioRaw": "2.42",
+            "openPriceRaw": "6995.67", "highPriceRaw": "7010.86", "lowPriceRaw": "6848.43",
+            "accumulatedTradingVolumeRaw": "332942000",
+            "localTradedAt": "2026-08-14T18:59:00+09:00"}]}
+        quote = MODULE.parse_naver_live(payload)
+        self.assertEqual(quote["date"], "2026-08-14")
 
 
 if __name__ == "__main__":
