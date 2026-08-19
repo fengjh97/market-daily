@@ -1,24 +1,30 @@
 {
- "updated": "2026-08-19 09:13",
+ "updated": "2026-08-19 11:43",
  "items": [
   {
    "kind": "report",
    "date": "2026-08-19",
-   "type": "open",
-   "ts": "09:13"
+   "type": "midday",
+   "ts": "11:43"
   },
   {
    "kind": "charts",
    "date": "2026-08-19",
    "file": "charts_asia",
    "scope": "asia",
-   "ts": "09:13"
+   "ts": "11:39"
   },
   {
    "kind": "charts",
    "date": "2026-08-19",
    "file": "charts_full",
    "scope": "full",
+   "ts": "11:39"
+  },
+  {
+   "kind": "report",
+   "date": "2026-08-19",
+   "type": "open",
    "ts": "09:13"
   },
   {
