@@ -1,6 +1,19 @@
 {
- "updated": "2026-09-02 05:14",
+ "updated": "2026-09-02 07:21",
  "items": [
+  {
+   "kind": "report",
+   "date": "2026-09-02",
+   "type": "morning",
+   "ts": "07:25"
+  },
+  {
+   "kind": "charts",
+   "date": "2026-09-02",
+   "file": "charts_full",
+   "scope": "full",
+   "ts": "07:15"
+  },
   {
    "kind": "report",
    "date": "2026-09-02",
@@ -12,13 +25,6 @@
    "date": "2026-09-02",
    "file": "charts_us",
    "scope": "us",
-   "ts": "05:10"
-  },
-  {
-   "kind": "charts",
-   "date": "2026-09-02",
-   "file": "charts_full",
-   "scope": "full",
    "ts": "05:10"
   },
   {
