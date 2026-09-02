@@ -1,18 +1,24 @@
 {
- "updated": "2026-09-03 05:12",
+ "updated": "2026-09-03 07:20",
  "items": [
   {
    "kind": "report",
    "date": "2026-09-03",
-   "type": "usclose",
-   "ts": "05:12"
+   "type": "morning",
+   "ts": "07:20"
   },
   {
    "kind": "charts",
    "date": "2026-09-03",
    "file": "charts_full",
    "scope": "full",
-   "ts": "05:09"
+   "ts": "07:13"
+  },
+  {
+   "kind": "report",
+   "date": "2026-09-03",
+   "type": "usclose",
+   "ts": "05:12"
   },
   {
    "kind": "charts",
